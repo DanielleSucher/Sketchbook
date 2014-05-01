@@ -1,13 +1,11 @@
 import itertools
 import string
-import sys
 from metaphone import doublemetaphone
 
 
 class HomophoneDictionary:
-  def __init__(self, input_file, output_file, min_chars=6, cutoff_denominator=4):
+  def __init__(self, input_file, min_chars=6, cutoff_denominator=4):
     self.input_file = input_file
-    self.output_file = output_file
     self.min_chars = min_chars
     self.cutoff_denominator = cutoff_denominator
 
@@ -32,11 +30,9 @@ class HomophoneDictionary:
     }
 
   def __export_wordlist(self, words):
-    f = open(self.output_file, 'a')
     for word_info in words.values():
       if self.__exportable(word_info):
-        f.write(','.join(word_info['graphemes']) + '\n')
-    f.close()
+        print(','.join(word_info['graphemes']))
 
   def __exportable(self, word_info):
     return len(word_info['graphemes']) > 1 and not word_info['inappropriate']
@@ -78,10 +74,9 @@ class HomophoneDictionary:
        
 
 if __name__ == '__main__':
-  sys.stdout.write('What is the path to your input wordlist?\n>> ')
+  term = open('/dev/tty', 'w+')
+  term.write('What is the path to your input wordlist?\n>> ')
   input_file = raw_input().lower()
+  term.close()
 
-  sys.stdout.write('What is the path to your preferred output file?\n>> ')
-  output_file = raw_input().lower()
-
-  HomophoneDictionary(input_file, output_file).create_soundalikes_wordlist()
+  HomophoneDictionary(input_file).create_soundalikes_wordlist()
