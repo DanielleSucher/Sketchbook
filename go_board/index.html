@@ -1,0 +1,70 @@
+<!-- TODO: -->
+<!-- auto capture -->
+<html>
+  <body>
+    <div id="captured"></div>
+    <br>
+    <canvas id="board" width=600 height=600></canvas>
+    <div id="score"></div>
+    <br>
+    <p style="margin-top:0px;padding-top:0px;">
+      <button id="undoButton">Undo</button>
+      <button id="passButton">Pass</button>
+      <button id="scoreButton">Score</button>
+    </p>
+ 
+    <script src="./js/utils.js"></script>
+    <script src="./js/goboard.js"></script>
+    <script src="./js/scoring.js"></script>
+    <script>
+      var board = document.getElementById("board");
+      var context = board.getContext("2d");
+
+      var undoButton = document.getElementById("undoButton");
+      var passButton = document.getElementById("passButton");
+      var scoreButton = document.getElementById("scoreButton");
+
+      var turn = 0;
+      var captures = {'white' : 0, 'black' : 0};
+      var boardSize = 19;
+      var gridWidth = 30;
+      var state = initializeEmptyGrid(boardSize);
+      var moves = []
+
+      // set up event handlers
+      board.onclick = function(e) {
+        var x = Math.round(e.offsetX / gridWidth);
+        var y = Math.round(e.offsetY / gridWidth);
+        var existing = state[y][x];
+        if (e.shiftKey) {
+          state[y][x] = null;
+          if (existing != null) {
+            captures[getColor(existing)] ++;
+          }
+        } else if (!existing) {
+          moves.push({'x': x, 'y': y});
+          state[y][x] = turn;
+          turn++;
+        }
+        drawBoard(context, boardSize, gridWidth, state, captures, moves);
+      }
+
+      undoButton.onclick = function(e) {
+        latest = moves.pop();
+        state[latest.y][latest.x] = null;
+        turn--;
+        drawBoard(context, boardSize, gridWidth, state, captures, moves);
+      }
+
+      passButton.onclick = function(e) {
+        turn++;
+      }
+
+      scoreButton.onclick = function(e) {
+        scoreBoard(state, boardSize);
+      }
+
+      drawBoard(context, boardSize, gridWidth, state, captures, moves);
+    </script>
+  </body>
+</html>
